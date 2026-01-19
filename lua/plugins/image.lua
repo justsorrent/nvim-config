@@ -5,5 +5,5 @@ return {
     processor = "magick_cli",
   },
   lazy = false,
-  disabled = true,
+  enabled = false,
 }
