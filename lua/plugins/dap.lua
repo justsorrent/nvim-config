@@ -64,6 +64,15 @@ return {
       dap.listeners.before.event_exited["dapui_config"] = function()
         dapui.close()
       end
+
+      -- Auto-show test report after test DAP session ends
+      dap.listeners.after.event_terminated["java_test_autoshow"] = function()
+        local ok, jt = pcall(require, "java-test")
+        if ok and jt.last_report then
+          jt.last_report:show_report()
+          jt.last_report = nil
+        end
+      end
     end,
   },
 

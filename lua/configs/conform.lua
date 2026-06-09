@@ -1,6 +1,7 @@
 local options = {
   formatters_by_ft = {
     lua = { "stylua" },
+    java = { lsp_format = "first" },
     -- css = { "prettier" },
     -- html = { "prettier" },
   },

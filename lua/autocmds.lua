@@ -8,6 +8,16 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "java", "properties", "xml" },
+  callback = function()
+    vim.opt_local.path:append("src/main/resources/dev/properties/default")
+    vim.opt_local.path:append("src/main/resources/dev/properties/override")
+    vim.opt_local.path:append("src/main/resources")
+    vim.opt_local.includeexpr = "substitute(v:fname, '\\${[^}]*}/', '', 'g')"
+  end,
+})
+
 vim.api.nvim_create_autocmd("BufDelete", {
   callback = function()
     local bufs = vim.t.bufs
