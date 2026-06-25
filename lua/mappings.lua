@@ -57,6 +57,54 @@ end, { desc = "LSP references (Trouble)" })
 -- LSP code actions (explicit, NvChad default also maps this)
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP code action" })
 
+-- Toggle format on save (conform.nvim)
+map("n", "<leader>tf", function()
+  vim.g.conform_format_on_save_disabled = not vim.g.conform_format_on_save_disabled
+  if vim.g.conform_format_on_save_disabled then
+    require("conform").setup({ format_on_save = false })
+    vim.notify("Format on save disabled", vim.log.levels.WARN)
+  else
+    require("conform").setup({ format_on_save = { timeout_ms = 500, lsp_fallback = true } })
+    vim.notify("Format on save enabled", vim.log.levels.INFO)
+  end
+end, { desc = "Toggle format on save" })
+
+-- Gitsigns: diff vs PR base branch
+map("n", "<leader>gP", function()
+  local handle = io.popen("gh pr view --json baseRefName -q .baseRefName 2>/dev/null")
+  if not handle then
+    vim.notify("gh not found", vim.log.levels.ERROR)
+    return
+  end
+  local base = handle:read("*l")
+  handle:close()
+  if not base or base == "" then
+    vim.notify("No open PR found", vim.log.levels.WARN)
+    return
+  end
+  local ref = "origin/" .. base
+  vim.notify("Fetching " .. ref .. "…", vim.log.levels.INFO)
+  vim.fn.jobstart({ "git", "fetch", "origin", base, "--no-tags", "--quiet" }, {
+    on_exit = function(_, code)
+      vim.schedule(function()
+        if code ~= 0 then
+          vim.notify("git fetch failed", vim.log.levels.ERROR)
+          return
+        end
+        require("gitsigns").change_base(ref, true)
+        require("gitsigns").refresh()
+        vim.notify("Gitsigns base: " .. ref, vim.log.levels.INFO)
+      end)
+    end,
+  })
+end, { desc = "Gitsigns: diff vs PR base branch" })
+
+map("n", "<leader>gR", function()
+  require("gitsigns").reset_base(true)
+  require("gitsigns").refresh()
+  vim.notify("Gitsigns base: reset to HEAD", vim.log.levels.INFO)
+end, { desc = "Gitsigns: reset base to HEAD" })
+
 -- Spotless Apply via gradlew (searches upward from buffer dir)
 map("n", "<leader>Gs", function()
   local buf_dir = vim.fn.expand "%:p:h"
