@@ -1,0 +1,12 @@
+tt.*
+.tests
+doc/tags
+debug
+.repro
+foo.*
+*.log
+data
+
+# Spell suggestion file: 19MB, and only affects the ordering/speed of `z=`.
+# The dictionary itself (spell/it.utf-8.spl) is tracked.
+spell/*.sug
